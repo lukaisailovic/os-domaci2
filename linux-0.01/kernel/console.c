@@ -491,6 +491,27 @@ void initialize_clipboard(struct clipboard_row *c_row){
 	
 }
 
+void clipboard_selected_item_del(){
+	cb_del(&clipboard[clipboard_selected_item]);
+}
+
+void clipboard_selected_item_up(){
+	if((clipboard_selected_item - 1) < 0){
+		clipboard_selected_item = 10;
+	} else {
+		clipboard_selected_item -= 1;
+	}
+	clipboard_draw();
+}
+void clipboard_selected_item_down(){
+	if((clipboard_selected_item + 1) > 10){
+		clipboard_selected_item = 0;	
+	} else {
+		clipboard_selected_item += 1;
+	}
+	clipboard_draw();
+}
+
 
 int clipboard_set_up = 10;
 
@@ -511,6 +532,19 @@ void clipboard_draw(){
 	draw_footer();
 	
 }
+void cb_del(struct clipboard_row *c_row){
+	int len = c_row->len;
+	if((len - 1) < 0){
+		len = 0;
+	} else {
+		len -= 1;
+	}
+	c_row->data[c_row->len] = 0;
+	c_row->len = len;
+	
+	clipboard_draw();
+}
+
 void cb_insert(struct clipboard_row *c_row,char c){
 	
 	

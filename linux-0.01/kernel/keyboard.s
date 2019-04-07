@@ -151,6 +151,26 @@ num:	xorb $2,leds
 	jmp set_leds
 
 /*
+	handles for UP,DOWN and DEL keys
+*/
+uphandle:
+	cmpl $1, (f3_pressed)
+	jne cursor
+	call clipboard_selected_item_up
+	ret
+	
+downhandle:
+	cmpl $1, (f3_pressed)
+	jne cursor
+	call clipboard_selected_item_down
+	ret 	 
+bshandle:
+	cmpl $1, (f3_pressed)
+	jne do_self
+	call clipboard_selected_item_del
+	ret
+
+/*
  *  curosr-key/numeric keypad cursor keys are handled here.
  *  checking for numeric keypad etc.
  */
@@ -347,7 +367,7 @@ key_table:
 	.long none,do_self,do_self,do_self	/* 00-03 s0 esc 1 2 */
 	.long do_self,do_self,do_self,do_self	/* 04-07 3 4 5 6 */
 	.long do_self,do_self,do_self,do_self	/* 08-0B 7 8 9 0 */
-	.long do_self,do_self,do_self,do_self	/* 0C-0F + ' bs tab */
+	.long do_self,do_self,bshandle,do_self	/* 0C-0F + ' bs tab */
 	.long do_self,do_self,do_self,do_self	/* 10-13 q w e r */
 	.long do_self,do_self,do_self,do_self	/* 14-17 t y u i */
 	.long do_self,do_self,do_self,do_self	/* 18-1B o p } ^ */
@@ -362,9 +382,9 @@ key_table:
 	.long f2func,f3func,func,func		/* 3C-3F f2 f3 f4 f5 */
 	.long func,func,func,func		/* 40-43 f6 f7 f8 f9 */
 	.long func,num,scroll,cursor		/* 44-47 f10 num scr home */
-	.long cursor,cursor,do_self,cursor	/* 48-4B up pgup - left */
+	.long uphandle,cursor,do_self,cursor	/* 48-4B up pgup - left */
 	.long cursor,cursor,do_self,cursor	/* 4C-4F n5 right + end */
-	.long cursor,cursor,cursor,cursor	/* 50-53 dn pgdn ins del */
+	.long downhandle,cursor,cursor,cursor	/* 50-53 dn pgdn ins del */
 	.long none,none,do_self,func		/* 54-57 sysreq ? < f11 */
 	.long func,none,none,none		/* 58-5B f12 ? ? ? */
 	.long none,none,none,none		/* 5C-5F ? ? ? ? */
