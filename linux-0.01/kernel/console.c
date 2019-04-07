@@ -462,8 +462,10 @@ CLIPBOARD START
 
 */
 
+static int clipboard_initialized = 0;
+
 struct clipboard_row {
-	char* data;
+	char data[20];
 	int len;
 
 };
@@ -475,6 +477,17 @@ int clipboard_selected_item = 5;
 
 void tool_start(){
 	clipboard_draw();
+	if(!clipboard_initialized){
+		int i; 
+		for(i= 0;i<10;i++){
+			initialize_clipboard(&clipboard[i]);
+		}
+		clipboard_initialized = 1;
+	}
+}
+
+void initialize_clipboard(struct clipboard_row *c_row){
+	c_row->len = 0;
 	
 }
 
@@ -499,10 +512,18 @@ void clipboard_draw(){
 	
 }
 void cb_insert(struct clipboard_row *c_row,char c){
-
-	int len = 0;
+	
+	
+	int len = c_row->len;
+	
+	if( (len+1) > 20 ){
+		return;
+	}
+	
 	c_row->data[len] = c;
-	c_row->len = len+1;	
+	c_row->len = len+1;
+	 	
+	clipboard_draw();
 }
 
 
@@ -702,6 +723,7 @@ void con_write(struct tty_struct * tty)
 		
 			if(c> 31 && c<127){
 				cb_insert(&clipboard[clipboard_selected_item],c);
+				continue;
 			}
 			//tool_draw();
 			
