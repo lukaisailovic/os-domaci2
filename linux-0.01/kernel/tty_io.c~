@@ -130,6 +130,7 @@ int f3_pressed_tty = 0;
 int f1_pressed_tty = 0;
 int space_pressed_tty = 0;
 
+
 void clipboard_copy(struct tty_struct * tty){
 	space_pressed_tty = 0;
 	cb_copy(tty);

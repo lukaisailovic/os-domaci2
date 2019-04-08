@@ -130,6 +130,7 @@ int f3_pressed_tty = 0;
 int f1_pressed_tty = 0;
 int space_pressed_tty = 0;
 
+
 void clipboard_copy(struct tty_struct * tty){
 	space_pressed_tty = 0;
 	cb_copy(tty);
@@ -142,7 +143,7 @@ void copy_to_cooked(struct tty_struct * tty)
 	while (!EMPTY(tty->read_q) && !FULL(tty->secondary)) {
 		GETCH(tty->read_q,c);
 		
-		if(f3_pressed_tty && !space_pressed_tty){
+		if(f3_pressed_tty){
 			cb_insert_call(c);
 			continue;
 		}
