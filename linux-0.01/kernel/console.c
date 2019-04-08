@@ -558,15 +558,18 @@ void cb_insert_call(char c){
 	cb_insert(&clipboard[clipboard_selected_item],c);		
 }
 
+
+/*
+	Space copies text to terminal
+*/
 void cb_copy(struct tty_struct * tty) {
 	struct clipboard_row *c_row;
 	c_row = &clipboard[clipboard_selected_item];
 	int len = c_row->len;
 	int i;
 	for(i = 0;i<len;i++){
-		PUTCH(c_row->data[i],tty->write_q);
-		tty->write(tty);
-		
+		PUTCH(c_row->data[i],tty->read_q);
+		copy_to_cooked(tty);	
 	}	
 }
 
