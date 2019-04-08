@@ -154,13 +154,13 @@ num:	xorb $2,leds
 	handles for UP,DOWN and DEL keys
 */
 uphandle:
-	cmpl $1, (f3_pressed)
+	cmpl $1, (f1_pressed)
 	jne cursor
 	call clipboard_selected_item_up
 	ret
 	
 downhandle:
-	cmpl $1, (f3_pressed)
+	cmpl $1, (f1_pressed)
 	jne cursor
 	call clipboard_selected_item_down
 	ret 	 
@@ -169,6 +169,12 @@ bshandle:
 	jne do_self
 	call clipboard_selected_item_del
 	ret
+sphandle:
+	//cmpl $1, (f1_pressed)
+	//jne do_self
+	movl $1, (space_pressed_tty)
+	//call clipboard_copy
+	jmp do_self;	
 
 /*
  *  curosr-key/numeric keypad cursor keys are handled here.
@@ -230,27 +236,42 @@ ok_func:
 	jmp put_queue
 end_func:
 	ret
-	
+//f1
+f1func:
+	cmpl $1, (f1_pressed)
+	je unset_f1	
+set_f1:
+	movl $1, (f1_pressed)
+	movl $1, (f1_pressed_tty)
+	jmp end_f1
+unset_f1:
+	movl $0, (f1_pressed)
+	movl $0, (f1_pressed_tty)			
+end_f1:		
+	ret
+//f2	
 f2func:
 	cmpl $1, (f2_pressed)
 	je unset_f2	
 set_f2:
-	//movl $1, (f2_pressed)
+	movl $1, (f2_pressed)
 	call tool_start
 	jmp end_f2
 unset_f2:
 	movl $0, (f2_pressed)			
 end_f2:		
 	ret
-	
+//f3	
 f3func:
 	cmpl $1, (f3_pressed)
 	je unset_f3	
 set_f3:
 	movl $1, (f3_pressed)
+	movl $1, (f3_pressed_tty)
 	jmp end_f3
 unset_f3:
-	movl $0, (f3_pressed)		
+	movl $0, (f3_pressed)
+	movl $0, (f3_pressed_tty)		
 end_f3:		
 	ret	
 
@@ -378,7 +399,7 @@ key_table:
 	.long do_self,do_self,do_self,do_self	/* 2C-2F z x c v */
 	.long do_self,do_self,do_self,do_self	/* 30-33 b n m , */
 	.long do_self,minus,rshift,do_self	/* 34-37 . - rshift * */
-	.long alt,do_self,caps,func		/* 38-3B alt sp caps f1 */
+	.long alt,sphandle,caps,f1func		/* 38-3B alt sp caps f1 */
 	.long f2func,f3func,func,func		/* 3C-3F f2 f3 f4 f5 */
 	.long func,func,func,func		/* 40-43 f6 f7 f8 f9 */
 	.long func,num,scroll,cursor		/* 44-47 f10 num scr home */

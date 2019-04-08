@@ -45,6 +45,7 @@ static unsigned long ques=0;
 static unsigned char attr=0x07;
 static unsigned char tool_attr=0x07;
 static unsigned char tool_selected_attr=0x70;
+volatile unsigned int f1_pressed = 0;
 volatile unsigned int f2_pressed = 0;
 volatile unsigned int f3_pressed = 0;
 static volatile unsigned char attr2=0x02;
@@ -472,7 +473,7 @@ struct clipboard_row {
 
 struct clipboard_row clipboard[10];
 
-int clipboard_selected_item = 5;
+int clipboard_selected_item = 0;
 
 
 void tool_start(){
@@ -492,19 +493,19 @@ void initialize_clipboard(struct clipboard_row *c_row){
 }
 
 void clipboard_selected_item_del(){
-	
+	cb_del(&clipboard[clipboard_selected_item]);
 }
 
 void clipboard_selected_item_up(){
 	if((clipboard_selected_item - 1) < 0){
-		clipboard_selected_item = 10;
+		clipboard_selected_item = 9;
 	} else {
 		clipboard_selected_item -= 1;
 	}
 	clipboard_draw();
 }
 void clipboard_selected_item_down(){
-	if((clipboard_selected_item + 1) > 10){
+	if((clipboard_selected_item + 1) > 9){
 		clipboard_selected_item = 0;	
 	} else {
 		clipboard_selected_item += 1;
@@ -543,6 +544,30 @@ void cb_del(struct clipboard_row *c_row){
 	c_row->len = len;
 	
 	clipboard_draw();
+}
+
+void cb_insert_call(char c){
+			/*
+			if(c> 31 && c<127){
+				cb_insert(&clipboard[clipboard_selected_item],c);
+				
+				continue;
+			}
+			*/
+			//tool_draw();
+	cb_insert(&clipboard[clipboard_selected_item],c);		
+}
+
+void cb_copy(struct tty_struct * tty) {
+	struct clipboard_row *c_row;
+	c_row = &clipboard[clipboard_selected_item];
+	int len = c_row->len;
+	int i;
+	for(i = 0;i<len;i++){
+		PUTCH(c_row->data[i],tty->write_q);
+		tty->write(tty);
+		
+	}	
 }
 
 void cb_insert(struct clipboard_row *c_row,char c){
@@ -753,14 +778,8 @@ void con_write(struct tty_struct * tty)
 	nr = CHARS(tty->write_q);
 	while (nr--) {
 		GETCH(tty->write_q,c);
-		if(f3_pressed){
+		if(0){
 		
-			if(c> 31 && c<127){
-				cb_insert(&clipboard[clipboard_selected_item],c);
-				continue;
-			}
-			//tool_draw();
-			
 		} else {
 		
 		switch(state) {
@@ -915,6 +934,7 @@ void con_write(struct tty_struct * tty)
 		}
 	}
 	set_cursor();
+	tool_start(); // re-draw tool after each input
 }
 
 /*

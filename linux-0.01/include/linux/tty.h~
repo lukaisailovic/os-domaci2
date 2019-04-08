@@ -68,7 +68,6 @@ int tty_write(unsigned c, char * buf, int n);
 
 
 void cb_insert_call(char c);
-void cb_copy(struct tty_struct * tty);
 void rs_write(struct tty_struct * tty);
 void con_write(struct tty_struct * tty);
 
