@@ -488,8 +488,42 @@ void tool_start(){
 }
 
 void initialize_clipboard(struct clipboard_row *c_row){
-	c_row->len = 0;
+		/*
+			TEST FILES
 	
+	
+			struct m_inode *dir_inode;
+			struct m_inode *root_inode; 
+			struct buffer_head * bh; 
+			root_inode = iget(0x301,1);
+			current->root = root_inode;
+			current->pwd = root_inode;
+			struct dir_entry *de;
+			
+			dir_inode = namei("/root");
+		
+			bh = read_file_block(dir_inode,BLOCK_SIZE);
+			int j,k;
+			unsigned int offset = 0;
+			for(j=0;j < 10;j++){
+				de = (struct dir_entry*) (offset + bh->b_data);
+				offset += sizeof(struct dir_entry);
+				if(de->inode){
+					for(k=0;k<NAME_LEN;k++){
+						if(de->name[k] != 0){
+							c_row->data[k] = de->name[k];
+							c_row->len = strlen(de->name[k]);
+						} 
+						
+					}
+					
+				}
+			}
+			
+	
+			END TEST FILES
+		*/ 
+	c_row->len = 0; 
 }
 
 void clipboard_selected_item_del(){
@@ -517,7 +551,8 @@ void clipboard_selected_item_down(){
 int clipboard_set_up = 10;
 
 void clipboard_draw(){	
-	draw_header("clipboard",9);
+
+	draw_header("clipboard",strlen("clipboard"));
 	int i;
 	
 	int height = tool_height - 2;
